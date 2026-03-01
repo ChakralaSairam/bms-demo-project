@@ -1,0 +1,528 @@
+{
+	"info": {
+		"name": "User Service - Movie Booking API",
+		"description": "Complete API collection for User Service with authentication, catalog, booking, and admin endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "userToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\",\n  \"roles\": [\"ADMIN\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"userToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"adminToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Catalog (Public)",
+			"item": [
+				{
+					"name": "Get All Movies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/movies",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "movies"]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Movie ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/shows/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "shows", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Booking (User)",
+			"item": [
+				{
+					"name": "Initiate Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"showId\": 1,\n  \"seatId\": \"A12\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/initiate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "initiate"]
+						}
+					}
+				},
+				{
+					"name": "Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": \"<booking-uuid-from-initiate-response>\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/payment",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "payment"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"showId\": 1,\n  \"seatId\": \"A12\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "cancel"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Movies",
+			"item": [
+				{
+					"name": "Create Movie",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Avengers: Endgame\",\n  \"genre\": \"Action\",\n  \"duration\": 181,\n  \"language\": \"English\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/movies",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "movies"]
+						}
+					}
+				},
+				{
+					"name": "Update Movie",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Avengers: Endgame (IMAX)\",\n  \"genre\": \"Action\",\n  \"duration\": 181,\n  \"language\": \"English\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/movies/4",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "movies", "4"]
+						}
+					}
+				},
+				{
+					"name": "Delete Movie",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/movies/4",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "movies", "4"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Theaters",
+			"item": [
+				{
+					"name": "Get All Theaters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/theaters",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "theaters"]
+						}
+					}
+				},
+				{
+					"name": "Create Theater",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Carnival Cinemas\",\n  \"city\": \"Hyderabad\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/theaters",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "theaters"]
+						}
+					}
+				},
+				{
+					"name": "Update Theater",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Carnival Cinemas IMAX\",\n  \"city\": \"Hyderabad\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/theaters/4",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "theaters", "4"]
+						}
+					}
+				},
+				{
+					"name": "Delete Theater",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/theaters/4",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "theaters", "4"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Shows",
+			"item": [
+				{
+					"name": "Get All Shows",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Create Show",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"movieId\": 1,\n  \"theaterId\": 1,\n  \"startTime\": \"2024-03-01T19:00:00\",\n  \"price\": 350.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Update Show",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"movieId\": 1,\n  \"theaterId\": 1,\n  \"startTime\": \"2024-03-01T21:00:00\",\n  \"price\": 400.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/shows/6",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "shows", "6"]
+						}
+					}
+				},
+				{
+					"name": "Delete Show",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/shows/6",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "shows", "6"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Internal API (For Go Service)",
+			"item": [
+				{
+					"name": "Get Booked Seats for Show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/internal/shows/1/booked-seats",
+							"host": ["{{baseUrl}}"],
+							"path": ["internal", "shows", "1", "booked-seats"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
