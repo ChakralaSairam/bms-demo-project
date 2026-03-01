@@ -1,0 +1,22 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+bin/
+
+# Go vendor (large, can be regenerated with `go mod vendor`)
+inventory-service/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
